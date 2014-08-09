@@ -128,10 +128,14 @@ class	URI
 
 		if ($other->path !== null)
 		{
-			if (substr ($other->path, 0, 1) !== '/')
+			if ($other->path === '' || $other->path[0] !== '/')
 			{
 				$offset = strrpos ($this->path, '/');
-				$path = ($offset !== false ? substr ($this->path, 0, $offset + 1) : '') . $other->path;
+
+				if ($offset !== false)
+					$path = substr ($this->path, 0, $offset + 1) . $other->path;
+				else
+					$path = $other->path;
 			}
 			else
 				$path = $other->path;
