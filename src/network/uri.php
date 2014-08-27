@@ -8,8 +8,14 @@ class	URI
 	{
 		// Match URI against pattern
 		//                 ((2:scheme) ) (  ((5: user  )( (7: pass))  )  (8: host )( (10:prt)) ) (11:pth)(   (13:qs)) ( (15))
-		if (preg_match ('!^(([^:/?#]+):)?(//(([^@:/?#]+)(:([^@/?#]*))?@)?([^:/?#]+)(:([0-9]+))?)?([^?#]*)(\\?([^#]*))?(#(.*))?$!', $uri, $matches) !== 1)
+		if (preg_match ('!^(([^:/?#]+):)?(//(([^@:/?#]+)(:([^@/?#]*))?@)?([^:/?#]+)(:([0-9]+))?)?([^?#]*)(\\?([^#]*))?(#(.*))?$!', $uri, $matches) === 1)
+			$this->valid = true;
+		else
+		{
+			$this->valid = false;
+
 			$matches = array ();
+		}
 
 		// Extract URI components parts
 		$this->fragment = isset ($matches[15]) && $matches[15] !== '' ? $matches[15] : null;
