@@ -2,9 +2,9 @@
 
 namespace Glay\Network;
 
-class	URI
+class URI
 {
-	public function	__construct ($uri)
+	public function __construct ($uri)
 	{
 		// Match URI against pattern
 		//                 ((2:scheme) ) (  ((5: user  )( (7: pass))  )  (8: host )( (10:prt)) ) (11:pth)(   (13:qs)) ( (15))
@@ -67,7 +67,28 @@ class	URI
 		return $uri;
 	}
 
-	public function	canonical ()
+	public function absolute ()
+	{
+		static $base;
+
+		if (!isset ($base))
+		{
+			$https = (isset ($_SERVER['HTTP_X_SSL']) && $_SERVER['HTTP_X_SSL'] === 'true') || (isset ($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== '' && $_SERVER['HTTPS'] !== 'off');
+			$port = $https ? 443 : 80;
+
+			$base = new URI
+			(
+				($https ? 'https' : 'http') . '://' .
+				(isset ($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== '' ? $_SERVER['HTTP_HOST'] : 'localhost') .
+				(isset ($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] !== $port ? ':' . $_SERVER['SERVER_PORT'] : '') .
+				(isset ($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '')
+			);
+		}
+
+		return $base->combine ($this);
+	}
+
+	public function canonical ()
 	{
 		$clone = clone $this;
 
@@ -113,7 +134,7 @@ class	URI
 		return $clone;
 	}
 
-	public function	combine ($other)
+	public function combine ($other)
 	{
 		if ($other->scheme !== null)
 			return $other;
