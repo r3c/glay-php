@@ -4,6 +4,11 @@ namespace Glay\Network;
 
 class URI
 {
+	public static function create ($uri)
+	{
+		return new URI ($uri);
+	}
+
 	public function __construct ($uri)
 	{
 		// Match URI against pattern
