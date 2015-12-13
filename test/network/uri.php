@@ -6,7 +6,7 @@ use Glay\Network\URI;
 
 function assert_absolute ($string, $expected)
 {
-	$result = (string)(new URI ($string))->absolute ();
+	$result = (string)URI::base ()->combine (URI::create ($string));
 
 	assert ($expected === $result, "assert_absolute: $expected != $result");
 }
@@ -128,6 +128,37 @@ assert_combine ($base, '../g', 'http://a/b/g');
 assert_combine ($base, '../..', 'http://a/');
 assert_combine ($base, '../../', 'http://a/');
 assert_combine ($base, '../../g', 'http://a/g');
+
+// Test conversion to relative URL
+$bases = array (							'http://domain',		'http://domain/',	'http://domain/home',	'http://domain/?a=5',	'http://domain/?a=1#key');
+$tests = array
+(
+	'http://domain'				=> array (	'',						'/',				'/',					'/',					'/'),
+	'http://domain/'			=> array (	'/',					'',					'/',					'?',					'?'),
+	'http://domain/home'		=> array (	'/home',				'/home',			'',						'/home',				'/home'),
+	'http://domain/home/help'	=> array (	'/home/help',			'/home/help',		'/home/help',/*/help*/	'/home/help',			'/home/help'),
+	'http://domain/other'		=> array (	'/other',				'/other',			'/other',				'/other',				'/other'),
+	'http://domain/?a=3'		=> array (	'/?a=3',				'?a=3',				'/?a=3',				'?a=3',					'?a=3'),
+	'http://domain/?a=5'		=> array (	'/?a=5',				'?a=5',				'/?a=5',				'',						'?a=5'),
+	'http://domain/?a=1#other'	=> array (	'/?a=1#other',			'?a=1#other',		'/?a=1#other',			'?a=1#other',			'#other'),
+	'http://'					=> array (	'//',					'//',				'//',					'//',					'//'),
+	'//other'					=> array (	'//other',				'//other',			'//other',				'//other',				'//other'),
+	'/path'						=> array (	'/path',				'/path',			'/path',				'/path',				'/path'),
+	'?a=1'						=> array (	'?a=1',					'?a=1',				'?a=1',					'?a=1',					'?a=1'),
+	'#key'						=> array (	'#key',					'#key',				'#key',					'#key',					'#key')
+);
+
+foreach ($bases as $i => $string)
+{
+	$base = new URI ($string);
+
+	foreach ($tests as $test => $references)
+	{
+		$result = (string)URI::create ($test)->relative ($base);
+
+		assert ($references[$i] === $result, "'$test' relative to '$string' should be '$references[$i]', got '$result'");
+	}
+}
 
 echo "OK";
 
