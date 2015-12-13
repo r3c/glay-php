@@ -131,54 +131,57 @@ class URI
 		return $canonical;
 	}
 
-	public function combine ($other)
+	public function combine ($with)
 	{
-		if ($other->scheme !== null)
-			$combine = $other;
+		if (is_string ($with))
+			$with = new self ($with);
 
-		else if ($other->host !== null)
+		if ($with->scheme !== null)
+			$combine = $with;
+
+		else if ($with->host !== null)
 		{
 			$combine = clone $this;
-			$combine->user = $other->user;
-			$combine->pass = $other->pass;
-			$combine->host = $other->host;
-			$combine->port = $other->port;
-			$combine->path = $other->path;
-			$combine->query = $other->query;
-			$combine->fragment = $other->fragment;
+			$combine->user = $with->user;
+			$combine->pass = $with->pass;
+			$combine->host = $with->host;
+			$combine->port = $with->port;
+			$combine->path = $with->path;
+			$combine->query = $with->query;
+			$combine->fragment = $with->fragment;
 		}
 
-		else if ($other->path !== null)
+		else if ($with->path !== null)
 		{
-			if ($other->path === '' || $other->path[0] !== '/')
+			if ($with->path === '' || $with->path[0] !== '/')
 			{
 				$offset = strrpos ($this->path, '/');
 
 				if ($offset !== false)
-					$path = substr ($this->path, 0, $offset + 1) . $other->path;
+					$path = substr ($this->path, 0, $offset + 1) . $with->path;
 				else
-					$path = $other->path;
+					$path = $with->path;
 			}
 			else
-				$path = $other->path;
+				$path = $with->path;
 
 			$combine = clone $this;
 			$combine->path = $path;
-			$combine->query = $other->query;
-			$combine->fragment = $other->fragment;
+			$combine->query = $with->query;
+			$combine->fragment = $with->fragment;
 		}
 
-		else if ($other->query !== null)
+		else if ($with->query !== null)
 		{
 			$combine = clone $this;
-			$combine->query = $other->query;
-			$combine->fragment = $other->fragment;
+			$combine->query = $with->query;
+			$combine->fragment = $with->fragment;
 		}
 
-		else if ($other->fragment !== null)
+		else if ($with->fragment !== null)
 		{
 			$combine = clone $this;
-			$combine->fragment = $other->fragment;
+			$combine->fragment = $with->fragment;
 		}
 
 		else
@@ -189,6 +192,9 @@ class URI
 
 	public function relative ($base)
 	{
+		if (is_string ($base))
+			$base = new self ($base);
+
 		$relative = clone $this;
 
 		if ($base->scheme !== $relative->scheme)

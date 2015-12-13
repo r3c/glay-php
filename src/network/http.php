@@ -28,7 +28,7 @@ class HTTP
 
 	public static function to ($url, $status = self::REDIRECT_FOUND)
 	{
-		return new HTTPMessage ($status, array ('Location' => $url), null);
+		return new HTTPMessage ($status, array ('Location' => (string)URI::base ()->combine ($url)), null);
 	}
 
 	public function __construct ()

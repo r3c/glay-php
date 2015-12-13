@@ -1,23 +1,24 @@
 <?php
 
-require ('../../src/network/http.php');
+require ('../../src/glay.php');
 
 use Glay\Network\HTTP;
+use Glay\Network\URI;
 
 function assert_message ($message, $status = null, $contents = null, $headers = array ())
 {
 	assert ($message !== null, 'Message is null');
 
 	if ($contents !== null)
-		assert (preg_match ($contents, $message->contents), 'Contents "' . $message->contents . '" does not match "' . $contents . '"');
+		assert (preg_match ($contents, $message->contents), 'Contents is "' . $message->contents . '", does not match "' . $contents . '"');
 
 	if ($status !== null)
-		assert ($message->status === $status, 'Status "' . $message->status . '" does not match "' . $status . '"');
+		assert ($message->status === $status, 'Status is "' . $message->status . '", not "' . $status . '"');
 
 	foreach ($headers as $name => $value)
 	{
 		assert (isset ($message->headers[$name]), 'Header "' . $name . '" is not set');
-		assert ($message->headers[$name] === $value, 'Value of header "' . $name . '" is not "' . $value . '"');
+		assert ($message->headers[$name] === $value, 'Value of header "' . $name . '" is "' . $message->headers[$name] . '", not "' . $value . '"');
 	}
 }
 
@@ -34,8 +35,8 @@ assert_message ($http->send ('GET', 'http://httpbin.org/image/png'), 200, null, 
 assert_message (HTTP::code (302), 302);
 assert_message (HTTP::code (404, 'test'), 404, '/test/');
 assert_message (HTTP::ok ('valid'), 200, '/valid/');
-assert_message (HTTP::to ('http://localhost/'), HTTP::REDIRECT_FOUND, null, array ('location' => 'http://localhost/'));
-assert_message (HTTP::to ('http://localhost/', HTTP::REDIRECT_PERMANENT), HTTP::REDIRECT_PERMANENT, null, array ('location' => 'http://localhost/'));
+assert_message (HTTP::to ('http://absolute/'), HTTP::REDIRECT_FOUND, null, array ('location' => 'http://absolute/'));
+assert_message (HTTP::to ('/relative', HTTP::REDIRECT_PERMANENT), HTTP::REDIRECT_PERMANENT, null, array ('location' => (string)URI::base ()->combine ('/relative')));
 
 echo "OK";
 

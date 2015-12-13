@@ -1,19 +1,19 @@
 <?php
 
-require ('../../src/network/uri.php');
+require ('../../src/glay.php');
 
 use Glay\Network\URI;
 
 function assert_absolute ($string, $expected)
 {
-	$result = (string)URI::base ()->combine (URI::create ($string));
+	$result = (string)URI::base ()->combine ($string);
 
 	assert ($expected === $result, "assert_absolute: $expected != $result");
 }
 
 function assert_combine ($base, $string, $expected)
 {
-	$result = (string)$base->combine (new URI ($string))->canonical ();
+	$result = (string)$base->combine ($string)->canonical ();
 
 	assert ($expected === $result, "assert_combine: $expected != $result");
 }
@@ -35,7 +35,7 @@ function assert_construct ($string, $parts)
 
 function assert_string ($expected)
 {
-	$result = (string)(new URI ($expected));
+	$result = (string)URI::create ($expected);
 
 	assert ($expected === $result, "assert_string: $expected != $result");
 }
@@ -148,15 +148,13 @@ $tests = array
 	'#key'						=> array (	'#key',					'#key',				'#key',					'#key',					'#key')
 );
 
-foreach ($bases as $i => $string)
+foreach ($bases as $i => $base)
 {
-	$base = new URI ($string);
-
 	foreach ($tests as $test => $references)
 	{
 		$result = (string)URI::create ($test)->relative ($base);
 
-		assert ($references[$i] === $result, "'$test' relative to '$string' should be '$references[$i]', got '$result'");
+		assert ($references[$i] === $result, "'$test' relative to '$base' should be '$references[$i]', got '$result'");
 	}
 }
 
