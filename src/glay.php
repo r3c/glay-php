@@ -2,27 +2,37 @@
 
 namespace Glay;
 
-function using ($class, $path)
+function using ($class, $path = null)
 {
-	static $libraries;
+	static $catalog;
+	static $include;
 
-	if (!isset ($libraries))
+	if (!isset ($catalog))
 	{
-		spl_autoload_register (function ($class) use (&$libraries)
+		spl_autoload_register (function ($class) use (&$catalog)
 		{
-			if (isset ($libraries[$class]))
-				require ($libraries[$class]);
+			if (isset ($catalog[$class]))
+				require ($catalog[$class]);
 		});
 
-		$libraries = array ();
+		$catalog = array ();
 	}
 
-	$libraries[$class] = $path;
+	// Register new class into library
+	if ($path !== null)
+	{
+		if (!isset ($include))
+			$include = dirname (__FILE__) . '/';
+
+		$catalog[$class] = $include . $path;
+	}
+
+	// Path not set, class contains new inclusing path base
+	else
+		$include = $class . '/';
 }
 
-$path = dirname (__FILE__);
-
-using ('Glay\\Network\\HTTP', $path . '/network/http.php');
-using ('Glay\\Network\\URI', $path . '/network/uri.php');
+using ('Glay\\Network\\HTTP', 'network/http.php');
+using ('Glay\\Network\\URI', 'network/uri.php');
 
 ?>
