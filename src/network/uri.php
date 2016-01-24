@@ -4,16 +4,21 @@ namespace Glay\Network;
 
 class URI
 {
-	public static function base ()
+	public static function create ($uri)
 	{
-		static $base;
+		return new URI ($uri);
+	}
 
-		if (!isset ($base))
+	public static function here ()
+	{
+		static $here;
+
+		if (!isset ($here))
 		{
 			$https = (isset ($_SERVER['HTTP_X_SSL']) && $_SERVER['HTTP_X_SSL'] === 'true') || (isset ($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== '' && $_SERVER['HTTPS'] !== 'off');
 			$port = $https ? 443 : 80;
 
-			$base = new URI
+			$here = new URI
 			(
 				($https ? 'https' : 'http') . '://' .
 				(isset ($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== '' ? $_SERVER['HTTP_HOST'] : 'localhost') .
@@ -22,12 +27,7 @@ class URI
 			);
 		}
 
-		return $base;
-	}
-
-	public static function create ($uri)
-	{
-		return new URI ($uri);
+		return $here;
 	}
 
 	public function __construct ($uri)

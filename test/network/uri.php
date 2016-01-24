@@ -6,7 +6,7 @@ use Glay\Network\URI;
 
 function assert_absolute ($string, $expected)
 {
-	$result = (string)URI::base ()->combine ($string);
+	$result = (string)URI::here ()->combine ($string);
 
 	assert ($expected === $result, "assert_absolute: $expected != $result");
 }
