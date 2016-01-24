@@ -197,12 +197,14 @@ class URI
 
 		$relative = clone $this;
 
+		// URIs differ on scheme
 		if ($base->scheme !== $relative->scheme)
 			return $relative;
 
 		$relative->scheme = null;
 
-		if ($base->host !== $relative->host)
+		// URIs differ on host
+		if ($base->host !== $relative->host || $base->pass !== $relative->pass || $base->port !== $relative->port || $base->user !== $relative->user)
 			return $relative;
 
 		$relative->host = null;
@@ -210,16 +212,25 @@ class URI
 		$relative->port = null;
 		$relative->user = null;
 
+		// URIs differ on path
 		if ($base->path !== $relative->path)
 		{
 			if ($relative->path === null)
 				$relative->path = '/';
+			else if ($base->path !== null)
+			{
+				$i = strrpos ($base->path, '/');
+
+				if ($i !== false && substr_compare ($base->path, $relative->path, 0, $i + 1) === 0)
+					$relative->path = (string)substr ($relative->path, $i + 1) ?: '.'; // FIXME: special case for "/x/ relative to /x/y"
+			}
 
 			return $relative;
 		}
 
 		$relative->path = null;
 
+		// URIs differ on query string
 		if ($base->query !== $relative->query)
 		{
 			if ($relative->query === null)
@@ -230,6 +241,7 @@ class URI
 
 		$relative->query = null;
 
+		// URIs differ on fragment
 		if ($base->fragment !== $relative->fragment)
 		{
 			if ($relative->fragment === null)
