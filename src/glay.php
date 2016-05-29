@@ -33,6 +33,7 @@ function using ($class, $path = null)
 }
 
 using ('Glay\\Network\\HTTP', 'network/http.php');
+using ('Glay\\Network\\SMTP', 'network/smtp.php');
 using ('Glay\\Network\\URI', 'network/uri.php');
 
 ?>
