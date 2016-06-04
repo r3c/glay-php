@@ -37,12 +37,12 @@ class URI
 
 		// Extract URI components parts
 		$this->fragment = isset ($matches[8]) && $matches[8] !== '' ? $matches[8] : null;
-		$this->host = isset ($matches[4]) && $matches[4] !== '' ? strtolower ($matches[4]) : null;
+		$this->host = isset ($matches[4]) && $matches[4] !== '' ? mb_strtolower ($matches[4]) : null;
 		$this->pass = isset ($matches[3]) && $matches[3] !== '' ? $matches[3] : null;
 		$this->path = isset ($matches[6]) && $matches[6] !== '' ? $matches[6] : null;
 		$this->port = isset ($matches[5]) && $matches[5] !== '' ? (int)$matches[5] : null;
 		$this->query = isset ($matches[7]) && $matches[7] !== '' ? $matches[7] : null;
-		$this->scheme = isset ($matches[1]) && $matches[1] !== '' ? strtolower ($matches[1]) : null;
+		$this->scheme = isset ($matches[1]) && $matches[1] !== '' ? mb_strtolower ($matches[1]) : null;
 		$this->user = isset ($matches[2]) && $matches[2] !== '' ? $matches[2] : null;
 	}
 
