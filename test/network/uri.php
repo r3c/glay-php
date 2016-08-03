@@ -1,7 +1,5 @@
 <?php
 
-require ('../../src/glay.php');
-
 use Glay\Network\URI;
 
 function assert_absolute ($string, $expected)
@@ -159,6 +157,6 @@ foreach ($bases as $i => $base)
 	}
 }
 
-echo "OK";
+echo 'OK';
 
 ?>

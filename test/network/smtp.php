@@ -1,7 +1,5 @@
 <?php
 
-require ('../../src/glay.php');
-
 use Glay\Network\SMTP;
 
 header ('Content-Type: text/plain');
@@ -15,6 +13,6 @@ $smtp->add_to ('recipient@mirari.fr', 'recipient');
 
 assert ($smtp->send ('Hello, World! À³©', "Body.\n\nÀ³©"));
 
-echo "OK";
+echo 'OK';
 
 ?>

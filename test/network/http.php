@@ -1,7 +1,5 @@
 <?php
 
-require ('../../src/glay.php');
-
 use Glay\Network\HTTP;
 use Glay\Network\URI;
 
@@ -38,6 +36,6 @@ assert_message (HTTP::ok ('valid'), 200, '/valid/');
 assert_message (HTTP::to ('http://absolute/'), HTTP::REDIRECT_FOUND, null, array ('location' => 'http://absolute/'));
 assert_message (HTTP::to ('/relative', HTTP::REDIRECT_PERMANENT), HTTP::REDIRECT_PERMANENT, null, array ('location' => (string)URI::here ()->combine ('/relative')));
 
-echo "OK";
+echo 'OK';
 
 ?>

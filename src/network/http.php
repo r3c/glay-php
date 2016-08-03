@@ -9,10 +9,11 @@ class HTTP
 	const REDIRECT_PROXY		= 305;
 	const REDIRECT_TEMPORARY	= 307;
 
-	public static $default_follow = false;
+	public static $default_connect_timeout = null;
 	public static $default_headers = array ();
+	public static $default_location_follow = false;
+	public static $default_location_max = null;
 	public static $default_proxy = null;
-	public static $default_redirect = null;
 	public static $default_timeout = null;
 	public static $default_useragent = null;
 
@@ -33,10 +34,11 @@ class HTTP
 
 	public function __construct ()
 	{
-		$this->follow = self::$default_follow;
+		$this->connect_timeout = self::$default_connect_timeout;
 		$this->headers = self::$default_headers;
+		$this->location_follow = self::$default_location_follow;
+		$this->location_max = self::$default_location_max;
 		$this->proxy = self::$default_proxy;
-		$this->redirect = self::$default_redirect;
 		$this->timeout = self::$default_timeout;
 		$this->useragent = self::$default_useragent;
 	}
@@ -51,11 +53,14 @@ class HTTP
 		$handle = curl_init ();
 		$method = strtoupper ($method);
 
+		if ($this->connect_timeout !== null)
+			curl_setopt ($handle, CURLOPT_CONNECTTIMEOUT_MS, $this->connect_timeout);
+
 		if (count ($this->headers) > 0)
 			curl_setopt ($handle, CURLOPT_HTTPHEADER, array_values ($this->headers));
 
-		if ($this->redirect !== null)
-			curl_setopt ($handle, CURLOPT_MAXREDIRS, $this->redirect);
+		if ($this->location_max !== null)
+			curl_setopt ($handle, CURLOPT_MAXREDIRS, $this->location_max);
 
 		if ($this->proxy !== null)
 			curl_setopt ($handle, CURLOPT_PROXY, $this->proxy);
@@ -69,7 +74,7 @@ class HTTP
 		if ($data !== null)
 			curl_setopt ($handle, CURLOPT_POSTFIELDS, $data);
 
-		curl_setopt ($handle, CURLOPT_FOLLOWLOCATION, $this->follow);
+		curl_setopt ($handle, CURLOPT_FOLLOWLOCATION, $this->location_follow);
 		curl_setopt ($handle, CURLOPT_HEADER, true);
 		curl_setopt ($handle, CURLOPT_NOBODY, $method === 'HEAD');
 		curl_setopt ($handle, CURLOPT_RETURNTRANSFER, true);
