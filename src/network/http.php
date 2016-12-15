@@ -50,6 +50,9 @@ class HTTP
 
 	public function send ($method, $url, $data = null)
 	{
+		if (preg_match ('#^https?://#', $url) !== 1)
+			return null;
+
 		$handle = curl_init ();
 		$method = strtoupper ($method);
 
