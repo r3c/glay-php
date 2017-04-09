@@ -9,20 +9,20 @@ class URI
 		return new URI ($uri);
 	}
 
-	public static function here ()
+	public static function here ($no_cache = false)
 	{
 		static $here;
 
-		if (!isset ($here))
+		if (!isset ($here) || $no_cache)
 		{
-			$https = (isset ($_SERVER['HTTP_X_SSL']) && $_SERVER['HTTP_X_SSL'] === 'true') || (isset ($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== '' && $_SERVER['HTTPS'] !== 'off');
+			$https = (isset ($_SERVER['HTTP_X_SSL']) && $_SERVER['HTTP_X_SSL'] !== '' && $_SERVER['HTTP_X_SSL'] !== 'off') || (isset ($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== '' && $_SERVER['HTTPS'] !== 'off');
 			$port = $https ? 443 : 80;
 
 			$here = new URI
 			(
 				($https ? 'https' : 'http') . '://' .
 				(isset ($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== '' ? $_SERVER['HTTP_HOST'] : 'localhost') .
-				(isset ($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] !== $port ? ':' . $_SERVER['SERVER_PORT'] : '') .
+				(isset ($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] !== '' && (int)$_SERVER['SERVER_PORT'] !== $port ? ':' . $_SERVER['SERVER_PORT'] : '') .
 				(isset ($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '')
 			);
 		}
