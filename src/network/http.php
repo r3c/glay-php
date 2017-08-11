@@ -4,6 +4,8 @@ namespace Glay\Network;
 
 class HTTP
 {
+	const FAILURE				= 0;
+	const SUCCESS				= 200;
 	const REDIRECT_PERMANENT	= 301;
 	const REDIRECT_FOUND		= 302;
 	const REDIRECT_PROXY		= 305;
@@ -17,19 +19,19 @@ class HTTP
 	public static $default_timeout = null;
 	public static $default_useragent = null;
 
-	public static function code ($status, $contents = null)
+	public static function code ($code, $data = null, $headers = null)
 	{
-		return new HTTPMessage ($status, null, $contents);
+		return new HTTPResponse ($code, $headers, $data);
 	}
 
-	public static function ok ($contents)
+	public static function data ($data, $headers = null)
 	{
-		return new HTTPMessage (200, null, $contents);
+		return new HTTPResponse (self::SUCCESS, $headers, $data);
 	}
 
-	public static function to ($url, $status = self::REDIRECT_FOUND)
+	public static function goto ($url, $code = self::REDIRECT_FOUND)
 	{
-		return new HTTPMessage ($status, array ('Location' => (string)URI::here ()->combine ($url)), null);
+		return new HTTPResponse ($code, array ('Location' => (string)URI::here ()->combine ($url)), null);
 	}
 
 	public function __construct ()
@@ -48,10 +50,10 @@ class HTTP
 		$this->headers[strtolower ($name)] = $name . ($value !== null ? ': ' . $value : '');
 	}
 
-	public function send ($method, $url, $data = null)
+	public function query ($method, $url, $body = null)
 	{
 		if (preg_match ('#^https?://#', $url) !== 1)
-			return null;
+			return self::code (self::FAILURE);
 
 		$handle = curl_init ();
 		$method = strtoupper ($method);
@@ -74,8 +76,8 @@ class HTTP
 		if ($this->useragent !== null)
 			curl_setopt ($handle, CURLOPT_USERAGENT, $this->useragent);
 
-		if ($data !== null)
-			curl_setopt ($handle, CURLOPT_POSTFIELDS, $data);
+		if ($body !== null)
+			curl_setopt ($handle, CURLOPT_POSTFIELDS, $body);
 
 		curl_setopt ($handle, CURLOPT_FOLLOWLOCATION, $this->location_follow);
 		curl_setopt ($handle, CURLOPT_HEADER, true);
@@ -87,12 +89,12 @@ class HTTP
 		curl_setopt ($handle, CURLOPT_URL, $url);
 
 		$output = curl_exec ($handle);
-		$status = curl_getinfo ($handle, CURLINFO_HTTP_CODE);
+		$code = curl_getinfo ($handle, CURLINFO_HTTP_CODE);
 
 		curl_close ($handle);
 
 		if ($output === false)
-			return null;
+			return self::code (self::FAILURE);
 
 		$headers = array ();
 		$offset = strpos ($output, "\r\n\r\n");
@@ -106,11 +108,11 @@ class HTTP
 			$headers[trim ($fragments[0])] = count ($fragments) > 1 ? trim ($fragments[1]) : '';
 		}
 
-		return new HTTPMessage ($status, $headers, (string)substr ($output, $offset + 4));
+		return new HTTPResponse ($code, $headers, (string)substr ($output, $offset + 4));
 	}
 }
 
-class HTTPMessage
+class HTTPResponse
 {
 	private static $messages = array
 	(
@@ -125,31 +127,41 @@ class HTTPMessage
 		501	=> 'Not Implemented'
 	);
 
-	public function __construct ($status, $headers, $contents)
+	public function __construct ($code, $headers, $data)
 	{
-		$this->contents = $contents;
+		$this->code = (int)$code;
+		$this->data = $data;
 		$this->headers = array_change_key_case ((array)$headers);
-		$this->status = (int)$status;
+	}
+
+	public function header ($name, $default = null)
+	{
+		$key = strtolower ($name);
+
+		if (isset ($this->headers[$key]))
+			return $this->headers[$key];
+
+		return $default;
 	}
 
 	public function	send ()
 	{
-		if ($this->status !== 200)
+		if ($this->code !== HTTP::SUCCESS)
 		{
-			if (isset (self::$messages[$this->status]))
-				header ('HTTP/1.1 ' . $this->status . ' ' . self::$messages[$this->status], true, $this->status);
+			if (isset (self::$messages[$this->code]))
+				header ('HTTP/1.1 ' . $this->code . ' ' . self::$messages[$this->code], true, $this->code);
 			else
-				header ('HTTP/1.1 ' . $this->status, true, $this->status);
+				header ('HTTP/1.1 ' . $this->code, true, $this->code);
 		}
 
 		if ($this->headers !== null)
 		{
 			foreach ($this->headers as $name => $value)
-				header (ucwords ($name) . ': ' . $value);
+				header (ucwords ($name, '-') . ': ' . $value);
 		}
 
-		if ($this->contents !== null)
-			echo $this->contents;
+		if ($this->data !== null)
+			echo $this->data;
 	}
 }
 
