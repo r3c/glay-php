@@ -29,7 +29,7 @@ class HTTP
 		return new HTTPResponse (self::SUCCESS, $headers, $data);
 	}
 
-	public static function goto ($url, $code = self::REDIRECT_FOUND)
+	public static function go ($url, $code = self::REDIRECT_FOUND)
 	{
 		return new HTTPResponse ($code, array ('Location' => (string)URI::here ()->combine ($url)), null);
 	}

@@ -37,8 +37,8 @@ assert_message ($http->query ('GET', 'invalid'), 0, '//');
 assert_message (HTTP::code (302), 302);
 assert_message (HTTP::code (404, 'test'), 404, '/test/');
 assert_message (HTTP::data ('valid'), 200, '/valid/');
-assert_message (HTTP::goto ('http://absolute/'), HTTP::REDIRECT_FOUND, null, array ('Location' => 'http://absolute/', 'location' => 'http://absolute/'));
-assert_message (HTTP::goto ('/relative', HTTP::REDIRECT_PERMANENT), HTTP::REDIRECT_PERMANENT, null, array ('location' => (string)URI::here ()->combine ('/relative')));
+assert_message (HTTP::go ('http://absolute/'), HTTP::REDIRECT_FOUND, null, array ('Location' => 'http://absolute/', 'location' => 'http://absolute/'));
+assert_message (HTTP::go ('/relative', HTTP::REDIRECT_PERMANENT), HTTP::REDIRECT_PERMANENT, null, array ('location' => (string)URI::here ()->combine ('/relative')));
 
 echo 'OK';
 
