@@ -16,6 +16,7 @@ class HTTP
 	public static $default_location_follow = false;
 	public static $default_location_max = null;
 	public static $default_proxy = null;
+	public static $default_size_max = null;
 	public static $default_timeout = null;
 	public static $default_useragent = null;
 
@@ -41,6 +42,7 @@ class HTTP
 		$this->location_follow = self::$default_location_follow;
 		$this->location_max = self::$default_location_max;
 		$this->proxy = self::$default_proxy;
+		$this->size_max = self::$default_size_max;
 		$this->timeout = self::$default_timeout;
 		$this->useragent = self::$default_useragent;
 	}
@@ -69,6 +71,9 @@ class HTTP
 
 		if ($this->proxy !== null)
 			curl_setopt ($handle, CURLOPT_PROXY, $this->proxy);
+
+		if ($this->size_max !== null)
+			curl_setopt ($handle, CURLOPT_PROGRESSFUNCTION, function ($handle, $size, $downloaded) { return $downloaded > $this->size_max ? 1 : 0; });
 
 		if ($this->timeout !== null)
 			curl_setopt ($handle, CURLOPT_TIMEOUT_MS, $this->timeout);
