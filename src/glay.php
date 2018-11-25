@@ -2,10 +2,9 @@
 
 namespace Glay;
 
-function using ($class, $path = null)
+function using ($class, $path)
 {
 	static $catalog;
-	static $include;
 
 	if (!isset ($catalog))
 	{
@@ -19,22 +18,14 @@ function using ($class, $path = null)
 	}
 
 	// Register new class into library
-	if ($path !== null)
-	{
-		if (!isset ($include))
-			$include = dirname (__FILE__) . '/';
-
-		$catalog[$class] = $include . $path;
-	}
-
-	// Path not set, class contains new inclusing path base
-	else
-		$include = $class . '/';
+	$catalog[$class] = $path;
 }
 
-using ('Glay\\Network\\HTTP', 'network/http.php');
-using ('Glay\\Network\\IPAddress', 'network/ip.php');
-using ('Glay\\Network\\SMTP', 'network/smtp.php');
-using ('Glay\\Network\\URI', 'network/uri.php');
+$base = dirname (__FILE__) . '/';
+
+using ('Glay\\Network\\HTTP', $base . '/network/http.php');
+using ('Glay\\Network\\IPAddress', $base . '/network/ip.php');
+using ('Glay\\Network\\SMTP', $base . '/network/smtp.php');
+using ('Glay\\Network\\URI', $base . '/network/uri.php');
 
 ?>
