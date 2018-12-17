@@ -28,10 +28,10 @@ assert_options(ASSERT_BAIL, true);
 
 $http = new HTTP();
 
-assert_message($http->query('GET', 'http://httpbin.org/get?key=value'), 200, '/"key":"value"/');
+assert_message($http->query('GET', 'http://httpbin.org/get?key=value'), 200, '/"key": "value"/');
 assert_message($http->query('GET', 'http://httpbin.org/headers'), 200, null, array('content-type' => 'application/json', 'Content-Type' => 'application/json'));
 assert_message($http->query('GET', 'http://httpbin.org/image/png'), 200, null, array('content-type' => 'image/png'));
-assert_message($http->query('POST', 'http://httpbin.org/post', array('key' => 'value')), 200, '/"key":"value"/');
+assert_message($http->query('POST', 'http://httpbin.org/post', array('key' => 'value')), 200, '/"key": "value"/');
 assert_message($http->query('GET', 'http://httpbin.org/status/408'), 408, null);
 assert_message($http->query('GET', 'invalid'), 0, '//');
 
