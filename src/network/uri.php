@@ -14,9 +14,20 @@ class URI
         static $here;
 
         if (!isset($here) || $no_cache) {
-            $https = (isset($_SERVER['HTTP_X_SSL']) && $_SERVER['HTTP_X_SSL'] !== '' && $_SERVER['HTTP_X_SSL'] !== 'off') || (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== '' && $_SERVER['HTTPS'] !== 'off');
+            // Deduce protocol scheme from proxy or server headers
+            if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+                $scheme = $_SERVER['HTTP_X_FORWARDED_PROTO'];
+            } elseif (isset($_SERVER['HTTP_X_SSL'])) {
+                $scheme = $_SERVER['HTTP_X_SSL'] !== '' && $_SERVER['HTTP_X_SSL'] !== '0' ? 'https' : 'http';
+            } elseif (isset($_SERVER['HTTPS'])) {
+                $scheme = $_SERVER['HTTPS'] !== '' && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
+            } else {
+                $scheme = 'http';
+            }
+
+            // Combine components to rebuild original URL
             $here = new URI(
-                ($https ? 'https' : 'http') . '://' .
+                $scheme . '://' .
                 (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== '' ? $_SERVER['HTTP_HOST'] : 'localhost') .
                 (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '')
             );

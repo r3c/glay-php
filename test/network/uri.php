@@ -57,11 +57,13 @@ header('Content-Type: text/plain');
 
 assert_options(ASSERT_BAIL, true);
 
-assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'HTTP_X_SSL' => '', 'REQUEST_URI' => ''), 'http://myhost?query');
-assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'HTTP_X_SSL' => '', 'REQUEST_URI' => '/path'), 'http://myhost/path?query');
-assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'HTTP_X_SSL' => 'off', 'REQUEST_URI' => ''), 'http://myhost?query');
-assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'HTTP_X_SSL' => 'on', 'REQUEST_URI' => ''), 'https://myhost?query');
-assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'HTTP_X_SSL' => 'on', 'REQUEST_URI' => ''), 'https://myhost?query');
+assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'HTTP_X_FORWARDED_PROTO' => 'https', 'REQUEST_URI' => ''), 'https://myhost?query');
+assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'HTTP_X_FORWARDED_PROTO' => 'http', 'REQUEST_URI' => ''), 'http://myhost?query');
+assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'HTTP_X_SSL' => '0', 'REQUEST_URI' => ''), 'http://myhost?query');
+assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'HTTP_X_SSL' => '1', 'REQUEST_URI' => ''), 'https://myhost?query');
+assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'HTTP_X_SSL' => '1', 'REQUEST_URI' => ''), 'https://myhost?query');
+assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'REQUEST_URI' => ''), 'http://myhost?query');
+assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'REQUEST_URI' => '/path'), 'http://myhost/path?query');
 
 assert_construct('http://domain.com', array('http', null, null, 'domain.com', null, null, null, null));
 assert_construct('http://domain.com/', array('http', null, null, 'domain.com', null, '/', null, null));
