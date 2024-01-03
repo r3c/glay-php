@@ -55,7 +55,7 @@ function assert_string($expected)
 
 header('Content-Type: text/plain');
 
-assert_options(ASSERT_BAIL, true);
+ini_set('assert.exception', true);
 
 assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'HTTP_X_FORWARDED_PROTO' => 'https', 'REQUEST_URI' => ''), 'https://myhost?query');
 assert_absolute('?query', array('HTTP_HOST' => 'myhost', 'HTTP_X_FORWARDED_PROTO' => 'http', 'REQUEST_URI' => ''), 'http://myhost?query');
@@ -149,22 +149,22 @@ assert_combine($base, '../../', 'http://a/');
 assert_combine($base, '../../g', 'http://a/g');
 
 // Test conversion to relative URL
-$bases = array(							'http://domain',		'http://domain/',	'http://domain/home',	'http://domain/sub/',	'http://domain/?a=5',	'http://domain/?a=1#key');
+$bases = array('http://domain',        'http://domain/',    'http://domain/home',    'http://domain/sub/',    'http://domain/?a=5',    'http://domain/?a=1#key');
 $tests = array(
-    'http://domain'				=> array(	'',						'/',				'/',					'/',					'/',					'/'),
-    'http://domain/'			=> array(	'/',					'',					'.',					'/',					'?',					'?'),
-    'http://domain/home'		=> array(	'/home',				'home',				'',						'/home',				'home',					'home'),
-    'http://domain/home/help'	=> array(	'/home/help',			'home/help',		'home/help',			'/home/help',			'home/help',			'home/help'),
-    'http://domain/sub'			=> array(	'/sub',					'sub',				'sub',					'/sub',					'sub',					'sub'),
-    'http://domain/sub/folder'	=> array(	'/sub/folder',			'sub/folder',		'sub/folder',			'folder',				'sub/folder',			'sub/folder'),
-    'http://domain/?a=3'		=> array(	'/?a=3',				'?a=3',				'.?a=3',				'/?a=3',				'?a=3',					'?a=3'),
-    'http://domain/?a=5'		=> array(	'/?a=5',				'?a=5',				'.?a=5',				'/?a=5',				'',						'?a=5'),
-    'http://domain/?a=1#other'	=> array(	'/?a=1#other',			'?a=1#other',		'.?a=1#other',			'/?a=1#other',			'?a=1#other',			'#other'),
-    'http://'					=> array(	'//',					'//',				'//',					'//',					'//',					'//'),
-    '//other'					=> array(	'//other',				'//other',			'//other',				'//other',				'//other',				'//other'),
-    '/path'						=> array(	'/path',				'/path',			'/path',				'/path',				'/path',				'/path'),
-    '?a=1'						=> array(	'?a=1',					'?a=1',				'?a=1',					'?a=1',					'?a=1',					'?a=1'),
-    '#key'						=> array(	'#key',					'#key',				'#key',					'#key',					'#key',					'#key')
+    'http://domain'                => array('',                        '/',                '/',                    '/',                    '/',                    '/'),
+    'http://domain/'            => array('/',                    '',                    '.',                    '/',                    '?',                    '?'),
+    'http://domain/home'        => array('/home',                'home',                '',                        '/home',                'home',                    'home'),
+    'http://domain/home/help'    => array('/home/help',            'home/help',        'home/help',            '/home/help',            'home/help',            'home/help'),
+    'http://domain/sub'            => array('/sub',                    'sub',                'sub',                    '/sub',                    'sub',                    'sub'),
+    'http://domain/sub/folder'    => array('/sub/folder',            'sub/folder',        'sub/folder',            'folder',                'sub/folder',            'sub/folder'),
+    'http://domain/?a=3'        => array('/?a=3',                '?a=3',                '.?a=3',                '/?a=3',                '?a=3',                    '?a=3'),
+    'http://domain/?a=5'        => array('/?a=5',                '?a=5',                '.?a=5',                '/?a=5',                '',                        '?a=5'),
+    'http://domain/?a=1#other'    => array('/?a=1#other',            '?a=1#other',        '.?a=1#other',            '/?a=1#other',            '?a=1#other',            '#other'),
+    'http://'                    => array('//',                    '//',                '//',                    '//',                    '//',                    '//'),
+    '//other'                    => array('//other',                '//other',            '//other',                '//other',                '//other',                '//other'),
+    '/path'                        => array('/path',                '/path',            '/path',                '/path',                '/path',                '/path'),
+    '?a=1'                        => array('?a=1',                    '?a=1',                '?a=1',                    '?a=1',                    '?a=1',                    '?a=1'),
+    '#key'                        => array('#key',                    '#key',                '#key',                    '#key',                    '#key',                    '#key')
 );
 
 foreach ($bases as $i => $base) {

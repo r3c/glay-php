@@ -4,12 +4,21 @@ namespace Glay\Network;
 
 class HTTP
 {
-    const FAILURE				= 0;
-    const SUCCESS				= 200;
-    const REDIRECT_PERMANENT	= 301;
-    const REDIRECT_FOUND		= 302;
-    const REDIRECT_PROXY		= 305;
-    const REDIRECT_TEMPORARY	= 307;
+    const FAILURE = 0;
+    const SUCCESS = 200;
+    const REDIRECT_PERMANENT = 301;
+    const REDIRECT_FOUND = 302;
+    const REDIRECT_PROXY = 305;
+    const REDIRECT_TEMPORARY = 307;
+
+    public $connect_timeout;
+    public $headers;
+    public $location_follow;
+    public $location_max;
+    public $proxy;
+    public $size_max;
+    public $timeout;
+    public $useragent;
 
     public static $default_connect_timeout = null;
     public static $default_headers = array();
@@ -20,17 +29,17 @@ class HTTP
     public static $default_timeout = null;
     public static $default_useragent = null;
 
-    public static function code($code, $data = null, $headers = null)
+    public static function code(int $code, string | null $data = null, array $headers = array()): HTTPResponse
     {
         return new HTTPResponse($code, $headers, $data);
     }
 
-    public static function data($data, $headers = null)
+    public static function data(string | null $data, array $headers = array()): HTTPResponse
     {
         return new HTTPResponse(self::SUCCESS, $headers, $data);
     }
 
-    public static function go($url, $code = self::REDIRECT_FOUND)
+    public static function go(string $url, int $code = self::REDIRECT_FOUND): HTTPResponse
     {
         return new HTTPResponse($code, array('Location' => (string)URI::here()->combine($url)), null);
     }
@@ -47,12 +56,12 @@ class HTTP
         $this->useragent = self::$default_useragent;
     }
 
-    public function header($name, $value = null)
+    public function header(string $name, string | null $value = null)
     {
         $this->headers[strtolower($name)] = $name . ($value !== null ? ': ' . $value : '');
     }
 
-    public function query($method, $url, $body = null)
+    public function query(string $method, string $url, array | null $body = null): HTTPResponse
     {
         if (preg_match('#^https?://#', $url) !== 1) {
             return self::code(self::FAILURE);
@@ -132,25 +141,29 @@ class HTTP
 class HTTPResponse
 {
     private static $messages = array(
-        400	=> 'Bad Request',
-        401	=> 'Unauthorized',
-        403	=> 'Forbidden',
-        404	=> 'Not Found',
-        405	=> 'Method Not Allowed',
-        406	=> 'Not Acceptable',
-        410	=> 'Gone',
-        500	=> 'Internal Server Error',
-        501	=> 'Not Implemented'
+        400 => 'Bad Request',
+        401 => 'Unauthorized',
+        403 => 'Forbidden',
+        404 => 'Not Found',
+        405 => 'Method Not Allowed',
+        406 => 'Not Acceptable',
+        410 => 'Gone',
+        500 => 'Internal Server Error',
+        501 => 'Not Implemented'
     );
 
-    public function __construct($code, $headers, $data)
+    public $code;
+    public $data;
+    public $headers;
+
+    public function __construct(int $code, array $headers, string | null $data)
     {
         $this->code = (int)$code;
         $this->data = $data;
         $this->headers = array_change_key_case((array)$headers);
     }
 
-    public function header($name, $default = null)
+    public function header(string $name, string | null $default = null): string
     {
         $key = strtolower($name);
 
@@ -161,7 +174,7 @@ class HTTPResponse
         return $default;
     }
 
-    public function send()
+    public function send(): void
     {
         if ($this->code !== HTTP::SUCCESS) {
             if (isset(self::$messages[$this->code])) {

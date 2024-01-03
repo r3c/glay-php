@@ -2,12 +2,12 @@
 
 namespace Glay;
 
-function using($class, $path)
+function using(string $class, string $path): void
 {
     static $catalog;
 
     if (!isset($catalog)) {
-        spl_autoload_register(function ($class) use (&$catalog) {
+        spl_autoload_register(function (string $class) use (&$catalog) {
             if (isset($catalog[$class])) {
                 require($catalog[$class]);
             }

@@ -4,7 +4,7 @@ use Glay\Network\SMTP;
 
 header('Content-Type: text/plain');
 
-assert_options(ASSERT_BAIL, true);
+ini_set('assert.exception', true);
 mb_internal_encoding('utf-8');
 
 $smtp = new SMTP();

@@ -12,7 +12,7 @@ function assert_address($string, $is_valid, $is_public)
 
 header('Content-Type: text/plain');
 
-assert_options(ASSERT_BAIL, true);
+ini_set('assert.exception', true);
 
 assert(IPAddress::create('1.2.3.4')->string === '1.2.3.4', 'IP address static "create" method is broken');
 

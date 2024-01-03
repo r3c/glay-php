@@ -24,7 +24,7 @@ function assert_message($message, $code = null, $data = null, $headers = array()
 
 header('Content-Type: text/plain');
 
-assert_options(ASSERT_BAIL, true);
+ini_set('assert.exception', true);
 
 $http = new HTTP();
 

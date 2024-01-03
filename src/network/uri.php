@@ -28,15 +28,25 @@ class URI
             // Combine components to rebuild original URL
             $here = new URI(
                 $scheme . '://' .
-                (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== '' ? $_SERVER['HTTP_HOST'] : 'localhost') .
-                (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '')
+                    (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== '' ? $_SERVER['HTTP_HOST'] : 'localhost') .
+                    (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '')
             );
         }
 
         return $here;
     }
 
-    public function __construct($uri)
+    public $fragment;
+    public $host;
+    public $pass;
+    public $path;
+    public $port;
+    public $query;
+    public $scheme;
+    public $user;
+    public $valid;
+
+    public function __construct(string $uri)
     {
         // Match URI against pattern: (  (1:scheme) ) (    (  (2: user  )(   (3: pass ))  )  (4: host)(   (5:port)) ) (6:path)(     (7: qs)) (   (8:))
         $this->valid = preg_match('!^(?:([^:/?#]+):)?(?://(?:([^@:/?#]+)(?::([^@/?#]*))?@)?([^:/?#]+)(?::([0-9]+))?)?([^?#]*)(?:\\?([^#]*))?(?:#(.*))?$!', $uri, $matches) === 1;
@@ -52,7 +62,7 @@ class URI
         $this->user = isset($matches[2]) && $matches[2] !== '' ? $matches[2] : null;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $uri = '';
 
@@ -95,7 +105,7 @@ class URI
         return $uri;
     }
 
-    public function canonical()
+    public function canonical(): URI
     {
         $canonical = clone $this;
 
@@ -136,7 +146,7 @@ class URI
         return $canonical;
     }
 
-    public function combine($with)
+    public function combine(URI | string $with): URI
     {
         if (is_string($with)) {
             $with = new self($with);
@@ -184,7 +194,7 @@ class URI
         return $combine;
     }
 
-    public function relative($base)
+    public function relative(URI | string $base): URI
     {
         if (is_string($base)) {
             $base = new self($base);
