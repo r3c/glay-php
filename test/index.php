@@ -1,5 +1,10 @@
-<?php header('Content-Type: text/plain'); ?>
-<?php require('../src/glay.php'); ?>
+<?php
+
+header('Content-Type: text/plain');
+
+require __DIR__ . '/../src/glay.php';
+
+?>
 Glay PHP Tests
 ==============
 

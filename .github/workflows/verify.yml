@@ -1,0 +1,32 @@
+name: Verify
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "45 4 * * *"
+
+jobs:
+  test:
+    name: Test with PHP ${{ matrix.php.version }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php:
+          - version: "8.1"
+          - version: "8.2"
+          - version: "8.3"
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup PHP v${{ matrix.php.version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php.version }}
+      - name: Run test suite
+        run: php test/index.php
