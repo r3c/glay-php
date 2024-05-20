@@ -178,10 +178,12 @@ class HTTPResponse
     {
         if ($this->code !== HTTP::SUCCESS) {
             if (isset(self::$messages[$this->code])) {
-                header('HTTP/1.1 ' . $this->code . ' ' . self::$messages[$this->code], true, $this->code);
+                $status_text = ' ' . self::$messages[$this->code];
             } else {
-                header('HTTP/1.1 ' . $this->code, true, $this->code);
+                $status_text = '';
             }
+
+            header($_SERVER['SERVER_PROTOCOL'] . ' ' . $this->code . $status_text, true, $this->code);
         }
 
         if ($this->headers !== null) {
