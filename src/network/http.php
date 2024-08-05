@@ -14,6 +14,7 @@ class HTTP
     public $cookies;
     public $connect_timeout;
     public $headers;
+    public $http_version;
     public $location_follow;
     public $location_max;
     public $proxy;
@@ -24,6 +25,7 @@ class HTTP
     public static $default_cookies = array();
     public static $default_connect_timeout = null;
     public static $default_headers = array();
+    public static $default_http_version = CURL_HTTP_VERSION_1_1;
     public static $default_location_follow = false;
     public static $default_location_max = null;
     public static $default_proxy = null;
@@ -51,6 +53,7 @@ class HTTP
         $this->cookies = self::$default_cookies;
         $this->connect_timeout = self::$default_connect_timeout;
         $this->headers = self::$default_headers;
+        $this->http_version = self::$default_http_version;
         $this->location_follow = self::$default_location_follow;
         $this->location_max = self::$default_location_max;
         $this->proxy = self::$default_proxy;
@@ -115,6 +118,7 @@ class HTTP
 
         curl_setopt($handle, CURLOPT_FOLLOWLOCATION, $this->location_follow);
         curl_setopt($handle, CURLOPT_HEADER, true);
+        curl_setopt($handle, CURLOPT_HTTP_VERSION, $this->http_version);
         curl_setopt($handle, CURLOPT_NOBODY, $method === 'HEAD');
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
