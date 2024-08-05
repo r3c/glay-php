@@ -11,6 +11,7 @@ class HTTP
     const REDIRECT_PROXY = 305;
     const REDIRECT_TEMPORARY = 307;
 
+    public $cookies;
     public $connect_timeout;
     public $headers;
     public $location_follow;
@@ -20,6 +21,7 @@ class HTTP
     public $timeout;
     public $useragent;
 
+    public static $default_cookies = array();
     public static $default_connect_timeout = null;
     public static $default_headers = array();
     public static $default_location_follow = false;
@@ -46,6 +48,7 @@ class HTTP
 
     public function __construct()
     {
+        $this->cookies = self::$default_cookies;
         $this->connect_timeout = self::$default_connect_timeout;
         $this->headers = self::$default_headers;
         $this->location_follow = self::$default_location_follow;
@@ -61,14 +64,20 @@ class HTTP
         $this->headers[strtolower($name)] = $name . ($value !== null ? ': ' . $value : '');
     }
 
-    public function query(string $method, string $url, array | null $body = null): HTTPResponse
+    public function query(string $method, string $url, array | string | null $body = null): HTTPResponse
     {
         if (preg_match('#^https?://#', $url) !== 1) {
-            return self::code(self::FAILURE);
+            return self::code(self::FAILURE, 'Invalid URL');
         }
 
         $handle = curl_init();
         $method = strtoupper($method);
+
+        if (count($this->cookies) > 0) {
+            curl_setopt($handle, CURLOPT_COOKIE, implode('; ', array_map(function ($key, $value) {
+                return rawurlencode($key) . '=' . rawurlencode($value);
+            }, array_keys($this->cookies), array_values($this->cookies))));
+        }
 
         if ($this->connect_timeout !== null) {
             curl_setopt($handle, CURLOPT_CONNECTTIMEOUT_MS, $this->connect_timeout);
@@ -119,7 +128,7 @@ class HTTP
         curl_close($handle);
 
         if ($output === false) {
-            return self::code(self::FAILURE);
+            return self::code(self::FAILURE, curl_error($handle));
         }
 
         $headers = array();
