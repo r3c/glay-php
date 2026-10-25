@@ -129,8 +129,6 @@ class HTTP
         $output = curl_exec($handle);
         $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
-        curl_close($handle);
-
         if ($output === false) {
             return self::code(self::FAILURE, curl_error($handle));
         }
